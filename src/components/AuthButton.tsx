@@ -1,29 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useAccount } from "@/lib/useAccount";
+import Avatar from "./Avatar";
 
 export default function AuthButton() {
-  const [user, setUser] = useState<User | null>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      setReady(true);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
+  const account = useAccount();
 
   async function login() {
     const supabase = createClient();
@@ -33,42 +16,40 @@ export default function AuthButton() {
     });
   }
 
-  async function logout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    setUser(null);
-  }
-
   // Keeps the space reserved while we check if someone is logged in
-  if (!ready) return <div className="h-11 w-24" aria-hidden="true" />;
+  if (!account.ready) return <div className="h-11 w-24" aria-hidden="true" />;
 
-  if (user) {
-    const fullName = user.user_metadata?.full_name ?? user.email ?? "there";
-    const firstName = String(fullName).split(" ")[0];
-
+  if (!account.user) {
     return (
-      <div className="flex items-center gap-3">
-        <span className="hidden text-sm font-semibold sm:inline">
-          Hi, {firstName}
-        </span>
+      <div className="flex items-center gap-2">
+        {process.env.NODE_ENV === "development" && (
+          <a
+            href="/dev-login"
+            className="flex min-h-11 items-center rounded-xl border border-dashed border-line px-3 text-xs font-semibold text-muted hover:bg-surface"
+          >
+            Dev admin
+          </a>
+        )}
         <button
           type="button"
-          onClick={logout}
-          className="min-h-11 cursor-pointer rounded-xl border border-line bg-white px-5 text-sm font-semibold transition-colors hover:bg-surface"
+          onClick={login}
+          className="min-h-11 cursor-pointer rounded-xl bg-brand px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
         >
-          Log out
+          Login
         </button>
       </div>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={login}
-      className="min-h-11 cursor-pointer rounded-xl bg-brand px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+    <Link
+      href="/profile"
+      className="flex min-h-11 items-center gap-2.5 rounded-xl border border-line bg-white py-1 pl-1.5 pr-3.5 text-sm font-semibold transition-colors hover:bg-surface"
     >
-      Login
-    </button>
+      <Avatar name={account.name} url={account.avatarUrl} size={34} />
+      <span className="hidden max-w-[150px] truncate sm:inline">
+        {account.name || "My account"}
+      </span>
+    </Link>
   );
 }

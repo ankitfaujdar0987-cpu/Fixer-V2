@@ -1,10 +1,13 @@
 import Link from "next/link";
 import AuthButton from "./AuthButton";
+import MenuButton from "./MenuButton";
+import PartnerButton from "./PartnerButton";
 
 export default function Navbar() {
   return (
     <header className="border-b border-line bg-white">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3.5 px-5 py-4 sm:px-10">
+        <MenuButton />
         <Link
           href="/"
           className="font-display text-3xl font-extrabold tracking-tight text-brand"
@@ -56,12 +59,7 @@ export default function Navbar() {
           />
         </label>
 
-        <Link
-          href="/partner/apply"
-          className="flex min-h-11 items-center px-1.5 text-sm font-semibold hover:text-brand"
-        >
-          Become a partner
-        </Link>
+          <PartnerButton />
         <AuthButton />
       </div>
     </header>
