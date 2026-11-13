@@ -1,19 +1,29 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useAccount } from "@/lib/useAccount";
+import { useAccount, type Account } from "@/lib/useAccount";
 import SidebarMenu from "./SidebarMenu";
 import SidebarDrawer from "./SidebarDrawer";
 import Avatar from "./Avatar";
+import { usePathname } from "next/navigation";
 
 export default function AccountShell({
   children,
+  previewAccount,
 }: {
   children: React.ReactNode;
+  previewAccount?: Account;
 }) {
-  const account = useAccount();
+  const realAccount = useAccount();
+  const account = previewAccount ?? realAccount;
+  const path = usePathname();
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
+
+  // The partner sign-up form is a full page without the sidebar
+  if (path.startsWith("/partner/apply") || path.startsWith("/partner/preview")) {
+    return <>{children}</>;
+  }
 
   if (!account.ready) {
     return <div className="min-h-screen bg-white" aria-busy="true" />;

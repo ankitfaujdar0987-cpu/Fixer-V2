@@ -21,6 +21,14 @@ const ICONS: Record<string, string> = {
   shield: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z",
   logout: "M10 4H5v16h5M15 8l4 4-4 4M19 12H9",
 };
+// Pages that have a sample-data preview version
+const PREVIEWABLE = [
+  "/dashboard",
+  "/bookings",
+  "/my-bookings",
+  "/reviews",
+  "/settings",
+];
 
 function Icon({ name }: { name: string }) {
   return (
@@ -54,15 +62,20 @@ function menuFor(a: Account): Item[] {
     label: "Settings",
     href: "/settings",
     icon: "settings",
-    ready: false,
+    ready: true,
+  };
+    const myBookings: Item = {
+    label: "My bookings",
+    href: "/my-bookings",
+    icon: "bookings",
+    ready: true,
   };
 
   const partnerItems: Item[] = [
-    { label: "Dashboard", href: "/dashboard", icon: "dashboard", ready: false },
+    { label: "Dashboard", href: "/dashboard", icon: "dashboard", ready: true },
     profile,
-    { label: "Bookings", href: "/partner", icon: "bookings", ready: true },
-    { label: "Earnings", href: "/earnings", icon: "earnings", ready: false },
-    { label: "Reviews", href: "/reviews", icon: "star", ready: false },
+    { label: "Bookings", href: "/bookings", icon: "bookings", ready: true },
+    { label: "Reviews", href: "/reviews", icon: "star", ready: true },
     {
       label: "Documents",
       href: "/partner/documents",
@@ -76,11 +89,12 @@ function menuFor(a: Account): Item[] {
     return [
       home,
       ...partnerItems,
+      myBookings,
       { label: "Admin panel", href: "/admin", icon: "shield", ready: true },
     ];
   }
   if (a.isPartner) return [home, ...partnerItems];
-  return [home, profile, settings];
+  return [home, profile, myBookings, settings];
 }
 
 export default function SidebarMenu({
@@ -92,7 +106,9 @@ export default function SidebarMenu({
   onNavigate?: () => void;
   onClose?: () => void;
 }) {
-  const path = usePathname();
+  const rawPath = usePathname();
+  const inPreview = rawPath.startsWith("/preview");
+  const path = rawPath.replace(/^\/preview(?=\/|$)/, "") || "/";
   const items = menuFor(account);
 
   // The most specific matching page is the highlighted one
@@ -180,7 +196,11 @@ export default function SidebarMenu({
             return (
               <li key={item.label}>
                 <Link
-                  href={item.href}
+                  href={
+                    inPreview && PREVIEWABLE.includes(item.href)
+                      ? "/preview" + item.href
+                      : item.href
+                  }
                   onClick={onNavigate}
                   aria-current={active ? "page" : undefined}
                   className={`${base} ${

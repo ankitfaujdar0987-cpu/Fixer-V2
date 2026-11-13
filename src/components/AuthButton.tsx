@@ -23,12 +23,20 @@ export default function AuthButton() {
     return (
       <div className="flex items-center gap-2">
         {process.env.NODE_ENV === "development" && (
-          <a
-            href="/dev-login"
-            className="flex min-h-11 items-center rounded-xl border border-dashed border-line px-3 text-xs font-semibold text-muted hover:bg-surface"
-          >
-            Dev admin
-          </a>
+          <>
+            <a
+              href="/dev-login"
+              className="flex min-h-11 items-center rounded-xl border border-dashed border-line px-3 text-xs font-semibold text-muted hover:bg-surface"
+            >
+              Dev admin
+            </a>
+            <a
+              href="/preview"
+              className="flex min-h-11 items-center rounded-xl border border-dashed border-line px-3 text-xs font-semibold text-muted hover:bg-surface"
+            >
+              Previews
+            </a>
+          </>
         )}
         <button
           type="button"

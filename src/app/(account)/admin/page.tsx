@@ -17,7 +17,8 @@ type Applicant = {
 
 const docLabel: Record<string, string> = {
   selfie: "Live selfie",
-  aadhaar: "Aadhaar card",
+  aadhaar: "Aadhaar card (front)",
+  aadhaar_back: "Aadhaar card (back)",
   pan: "PAN card",
 };
 
